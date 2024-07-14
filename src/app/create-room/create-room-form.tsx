@@ -25,31 +25,33 @@ import {
 import { createRoomAction } from './action'
 import { useRouter } from 'next/navigation'
 
-
-const formSchema = z.object({
-    name: z.string().min(2).max(50),
-    description: z.string().min(20).max(200),
-    language: z.string().min(4).max(15),
-    Linkedin: z.string().min(4).max(200),
-    isPrivate: z.string().min(3).max(10),
-    password: z.string().min(6).max(20).optional(),
-}).refine(
-    (data) => data.isPrivate !== "Private" || (data.isPrivate === "Private" && data.password),
-    {
-      message: "Password is required when the room is private",
-      path: ["password"],
-    }
-);
-
 export const privacy = [
     {"id": 1, name: "Private"},
     {"id": 2, name: "Public"}
 ]
+import { getSession } from 'next-auth/react';
 
 const CreateRoomForm = () => {
 
-    const [isPrivacy, setIsPrivacy] = useState<any>("Public")
+    const [isPrivacy, setIsPrivacy] = useState<string>("Public")
     const router = useRouter()
+
+    const formSchema = z.object({
+        name: z.string().min(2).max(50),
+        description: z.string().min(20).max(200),
+        language: z.string().min(4).max(15),
+        Linkedin: z.string().min(4).max(200),
+        isPrivate: z.string().min(3).max(10).default("Public"),
+        password: z.string().min(0).max(20).optional(),
+    }).superRefine((data, ctx) => {
+        if (data.isPrivate === "Private" && !data.password) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Password is required when the room is private",
+                path: ["password"],
+            });
+        }
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,18 +60,25 @@ const CreateRoomForm = () => {
             description: "",
             language: "",
             Linkedin: "",
-            isPrivate: "",
+            isPrivate: "Public",
             password: "",
         },
     })
 
     const handlePrivacyChange = (value: string) => {
-        setIsPrivacy(value)
+        setIsPrivacy(value);
+        form.setValue("isPrivate", value);
     }
 
-
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        const session = await getSession()
+
+        if (!session?.user.id) {
+            throw new Error("You must be logged in to create this room");
+        }
+
         const data = {
+            userId: session.user.id,
             name: values.name,
             description: values.description,
             language: values.language,
@@ -78,14 +87,13 @@ const CreateRoomForm = () => {
             password: values.password!
         }
         console.log(data)
+
         await createRoomAction(data)
         router.push("/")
     }
 
   return (
-    
         <Form {...form}>
-
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
             control={form.control}
@@ -157,12 +165,12 @@ const CreateRoomForm = () => {
 
             <FormField
             control={form.control}
-            name="description"
+            name="isPrivate"
             render={({ field }) => (
                 <FormItem>
                 <FormLabel>Privacy</FormLabel>
                 <FormControl>
-                    <Select onValueChange={handlePrivacyChange} defaultValue={field.value}>
+                    <Select onValueChange={handlePrivacyChange} defaultValue={isPrivacy}>
                         <SelectTrigger>
                             <SelectValue placeholder="Public" />
                         </SelectTrigger>
@@ -176,7 +184,7 @@ const CreateRoomForm = () => {
                     </Select>
                 </FormControl>
                 <FormDescription>
-                    Is you room is private or public?
+                    Is your room private or public?
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -201,8 +209,6 @@ const CreateRoomForm = () => {
                 )}
             />
             )}
-
-            
 
             <Button type="submit">Submit</Button>
         </form>

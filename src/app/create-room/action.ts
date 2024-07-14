@@ -2,13 +2,18 @@
 
 import { db } from '@/db';
 import { room, Room } from '@/db/schema';
-import { getSession } from 'next-auth/react';
+import bcrypt from 'bcrypt';
 
 
-export async function createRoomAction(roomData: Omit<Room, "userId">) {
-    const session = await getSession()
-    if(!session) {
-        throw new Error("You must be logged in to create this room")
+export async function createRoomAction(roomData: Omit<Room, "id">) {
+    
+    const password = roomData.password;
+    let hashedPassword = null
+    if(password){
+        hashedPassword = await bcrypt.hash(password, 10);
+    }else{
+        hashedPassword = ""
     }
-    await db.insert(room).values({ ...roomData, userId: session.user.id });
+
+    await db.insert(room).values({ ...roomData, password: hashedPassword, userId: roomData.userId });
 }
