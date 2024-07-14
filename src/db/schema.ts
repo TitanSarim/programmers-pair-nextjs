@@ -5,7 +5,7 @@ import {
     text,
     primaryKey,
     integer,
-    uuid,
+    uuid
   } from "drizzle-orm/pg-core"
   import postgres from "postgres"
   import { drizzle } from "drizzle-orm/postgres-js"
@@ -106,7 +106,7 @@ export const testing = pgTable("testing", {
 
      
   export const room = pgTable("room", {
-    id: uuid('id').default(sql`gen-random_uuid()`).notNull().primaryKey(),
+    id: uuid('id').defaultRandom().primaryKey(),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),

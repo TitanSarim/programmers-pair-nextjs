@@ -1,0 +1,3 @@
+if you are altering the table with drizzle use in pgadmin
+
+alter table "authenticator" drop constraint "authenticator_userId_credentialID_pk"
