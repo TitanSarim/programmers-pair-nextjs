@@ -11,15 +11,28 @@ import {
 } from "@/components/ui/card"
 import { Room } from "@/db/schema";
 import { Linkedin, LockIcon } from "lucide-react";
+import { getRooms } from "@/data-access/rooms";
+import { truncateText } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
 
 function RoomCard({room}: {room: Room}){
+
+  const languages = room.language.split(',').map((lang) => lang.trim());
+
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{room.name}</CardTitle>
-        <CardDescription>{room.description}</CardDescription>
+        <CardDescription>{truncateText(room.description, 50)}</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex flex-wrap w-full gap-3 mb-4">
+            {languages.map((lang)=> (
+                <Badge key={lang} variant="outline" className="w-fit py-2 px-4">{lang}</Badge>
+            ))}
+        </div>
         {room.Linkedin && <Link href={room.Linkedin} className="flex items-center gap-2" target="_blank" rel="noopener noreferrer"><Linkedin size={20} /> LinkedIn</Link>}
       </CardContent>
       <CardFooter>
@@ -38,7 +51,7 @@ function RoomCard({room}: {room: Room}){
 
 export default async function Home() {
 
-  const rooms = await db.query.room.findMany();
+  const rooms = await getRooms();
 
 
   return (

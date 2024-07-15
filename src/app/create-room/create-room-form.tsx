@@ -102,7 +102,7 @@ const CreateRoomForm = () => {
                 <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                    <Input  {...field} />
+                    <Input  {...field} placeholder='lets dicuss rust'/>
                 </FormControl>
                 <FormDescription>
                     This is your room display name or Topic.
@@ -136,7 +136,7 @@ const CreateRoomForm = () => {
                 <FormItem>
                 <FormLabel>Language</FormLabel>
                 <FormControl>
-                    <Input  {...field} />
+                    <Input  {...field} placeholder='typescript, nextjs, reactjs'/>
                 </FormControl>
                 <FormDescription>
                     Room language
@@ -153,7 +153,7 @@ const CreateRoomForm = () => {
                 <FormItem>
                 <FormLabel>Linkedin</FormLabel>
                 <FormControl>
-                    <Input  {...field} />
+                    <Input  {...field} placeholder='https://www.linkedin.com/in/muhammad-sarim-679576212/'/>
                 </FormControl>
                 <FormDescription>
                     Room language

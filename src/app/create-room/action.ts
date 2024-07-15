@@ -3,6 +3,7 @@
 import { db } from '@/db';
 import { room, Room } from '@/db/schema';
 import bcrypt from 'bcrypt';
+import { revalidatePath } from 'next/cache';
 
 
 export async function createRoomAction(roomData: Omit<Room, "id">) {
@@ -16,4 +17,6 @@ export async function createRoomAction(roomData: Omit<Room, "id">) {
     }
 
     await db.insert(room).values({ ...roomData, password: hashedPassword, userId: roomData.userId });
+
+    revalidatePath("/")
 }
