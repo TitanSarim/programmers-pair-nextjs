@@ -57,5 +57,5 @@ export const authConfig = {
 
 
 export function getSession() {
-    getServerSession(authConfig)
+  return  getServerSession(authConfig)
 }

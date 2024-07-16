@@ -3,11 +3,13 @@ import {Linkedin } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { VideoPlayer } from "./videoPlayer"
+import { unstable_noStore } from "next/cache"
 
 export default async function RoomPage(props: {params: {roomid: string}}){
 
     const roomId = props.params.roomid
 
+    unstable_noStore()
     const room = await getRoom(roomId)
 
     if(!room){

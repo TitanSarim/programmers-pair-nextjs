@@ -38,7 +38,7 @@ function HeaderDropDown(){
             <DropdownMenuContent>
                 <DropdownMenuSeparator />
                 {session.data ? (
-                    <DropdownMenuItem onClick={() =>  signOut()}> <LogOutIcon className="mr-2"/> Sign Out</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() =>  signOut({callbackUrl: '/'})}> <LogOutIcon className="mr-2"/> Sign Out</DropdownMenuItem>
                 ) : (
                     <DropdownMenuItem onClick={() =>  signIn('google')}> <LogInIcon className="mr-2"/> Sign In</DropdownMenuItem>
                 )}
@@ -49,7 +49,6 @@ function HeaderDropDown(){
 
 
 export function Header() {
-    const session = useSession();
 
 
     return(
