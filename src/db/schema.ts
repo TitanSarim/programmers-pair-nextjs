@@ -11,7 +11,7 @@ import {
   import { drizzle } from "drizzle-orm/postgres-js"
   import type { AdapterAccount } from "next-auth/adapters"
   import * as fs from 'fs';
-  const caCertificate = fs.readFileSync("ca.pem").toString();
+  const caCertificate = fs.readFileSync("./src/db/certificate.pem").toString();
 
   console.log("caCertificate", caCertificate)
 
