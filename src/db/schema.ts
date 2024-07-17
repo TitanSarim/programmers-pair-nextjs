@@ -10,20 +10,19 @@ import {
   import postgres from "postgres"
   import { drizzle } from "drizzle-orm/postgres-js"
   import type { AdapterAccount } from "next-auth/adapters"
-  import * as fs from 'fs';
-  const caCertificate = fs.readFileSync("./src/db/certificate.pem").toString();
+import { sql } from "drizzle-orm"
 
-  console.log("caCertificate", caCertificate)
+export const testing = pgTable("testing", {
+    id: text("id").notNull().primaryKey(),
+    name: text("name")
+})
 
+
+
+
+   
   const connectionString = process.env.DATABASE_URL!
-  const pool = postgres(connectionString, {
-    max: 1,
-    ssl: {
-      rejectUnauthorized: true,
-      ca: caCertificate
-    }
-  });
-  
+  const pool = postgres(connectionString, { max: 1 })
    
   export const db = drizzle(pool)
    
