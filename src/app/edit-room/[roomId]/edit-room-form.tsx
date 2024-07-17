@@ -22,29 +22,27 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { createRoomAction } from './action'
-import { useRouter } from 'next/navigation'
+import { editRoomAction } from './action'
+import { useParams } from 'next/navigation'
 
 export const privacy = [
     {"id": 1, name: "Private"},
     {"id": 2, name: "Public"}
 ]
 import { getSession } from 'next-auth/react';
-import { useToast } from '@/components/ui/use-toast';
+import { Room } from '@/db/schema';
 
-const CreateRoomForm = () => {
+const EditRoomForm = ({room}: {room: Room}) => {
 
-    const [isPrivacy, setIsPrivacy] = useState<string>("Public")
-    const router = useRouter()
-    const { toast } = useToast()
-
+    const [isPrivacy, setIsPrivacy] = useState<string>(room.isPrivate)
+    const params = useParams<{ id: string;}>()
 
     const formSchema = z.object({
         name: z.string().min(2).max(50),
-        description: z.string().min(20).max(200),
+        description: z.string().min(15).max(200),
         language: z.string().min(4).max(40),
         Linkedin: z.string().min(4).max(200),
-        isPrivate: z.string().min(3).max(10).default("Public"),
+        isPrivate: z.string().min(3).max(10).default(room.isPrivate),
         password: z.string().min(0).max(20).optional(),
     }).superRefine((data, ctx) => {
         if (data.isPrivate === "Private" && !data.password) {
@@ -59,18 +57,22 @@ const CreateRoomForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            description: "",
-            language: "",
-            Linkedin: "",
-            isPrivate: "Public",
-            password: "",
+            name: room.name ?? "",
+            description: room.description ?? "",
+            language: room.language ?? "",
+            Linkedin: room.Linkedin ?? "",
+            isPrivate: room.isPrivate ?? "",
+            password: room.password ?? "",
         },
     })
 
     const handlePrivacyChange = (value: string) => {
         setIsPrivacy(value);
-        form.setValue("isPrivate", value);
+        if(value === 'Public'){
+            form.setValue("password", '');
+        }else{
+            form.setValue("isPrivate", value);
+        }
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -87,16 +89,11 @@ const CreateRoomForm = () => {
             language: values.language,
             Linkedin: values.Linkedin,
             isPrivate: isPrivacy,
-            password: values.password!
+            password: values.password!,
         }
         console.log(data)
 
-        await createRoomAction(data)
-        toast({
-            title: 'Room created',
-            description: 'Your room has been created'
-        });
-        router.push("/your-rooms")
+        await editRoomAction({id: room.id, ...data})
     }
 
   return (
@@ -223,4 +220,4 @@ const CreateRoomForm = () => {
   )
 }
 
-export default CreateRoomForm
+export default EditRoomForm

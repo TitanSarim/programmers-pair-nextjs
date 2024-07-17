@@ -1,10 +1,11 @@
 "use server";
 
 import { db } from "@/db";
-import { room } from "@/db/schema";
+import { Room, room } from "@/db/schema";
 import { eq, ilike, like } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { unstable_noStore } from "next/cache";
+import bcrypt from 'bcrypt';
 
 export async function getRooms(search: string | undefined){
     unstable_noStore()
@@ -46,3 +47,31 @@ export async function GetUserRooms() {
 export async function deleteRoom(roomId: string) {
     await db.delete(room).where(eq(room.id, roomId))
 }
+
+export async function createRoom(roomData: Omit<Room, "id">){
+
+    const password = roomData.password;
+    let hashedPassword = null
+    if(password){
+        hashedPassword = await bcrypt.hash(password, 10);
+    }else{
+        hashedPassword = ""
+    }
+
+    await db.insert(room).values({ ...roomData, password: hashedPassword, userId: roomData.userId });
+}
+
+export async function editRoom(roomData: Room){
+
+    const password = roomData.password;
+    let hashedPassword = null
+    if(password){
+        hashedPassword = await bcrypt.hash(password, 10);
+    }else{
+        hashedPassword = ""
+    }
+
+
+    await db.update(room).set({ ...roomData, password: hashedPassword}).where(eq(room.id, roomData.id));
+}
+

@@ -19,7 +19,7 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
 import { Room } from "@/db/schema";
-import { Linkedin, LockIcon, Trash } from "lucide-react";
+import { Linkedin, LockIcon, Pencil, Trash } from "lucide-react";
 import { truncateText } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,12 @@ export const UserRoomCard = ({room}: {room: Room}) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{room.name}</CardTitle>
+          <div className="flex flex-row-reverse justify-between items-center">
+            <Button size="icon" variant="outline" asChild>
+              <Link href={`/edit-room/${room.id}`}><Pencil color="tomato"/></Link>
+            </Button>
+            <CardTitle>{truncateText(room.name, 40)}</CardTitle>
+          </div>
           <CardDescription>{truncateText(room.description, 50)}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -46,7 +51,7 @@ export const UserRoomCard = ({room}: {room: Room}) => {
           {room.Linkedin && <Link href={room.Linkedin} className="flex items-center gap-2" target="_blank" rel="noopener noreferrer"><Linkedin size={20} /> LinkedIn</Link>}
         </CardContent>
         <CardFooter>
-          {room.password ? (
+          {room.isPrivate === 'Public' ? (
             <div className="flex flex-row gap-4">
               <Button asChild>
                 <Link href={`/rooms/${room.id}`}>Join Room</Link>
@@ -61,7 +66,7 @@ export const UserRoomCard = ({room}: {room: Room}) => {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your account
+                      This action cannot be undone. This will permanently delete your room
                       and remove your data associated with it.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -78,7 +83,7 @@ export const UserRoomCard = ({room}: {room: Room}) => {
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant='secondary'>
-                    <Trash color="red"/>
+                    <Trash color="tomato"/>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

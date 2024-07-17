@@ -38,7 +38,7 @@ export const RoomCard = ({room}: {room: Room}) => {
           {room.Linkedin && <Link href={room.Linkedin} className="flex items-center gap-2" target="_blank" rel="noopener noreferrer"><Linkedin size={20} /> LinkedIn</Link>}
         </CardContent>
         <CardFooter>
-          {room.password ? (
+          {room.isPrivate === 'Public' ? (
             <Button asChild>
                 {session.data ? (
                     <Link href={`/rooms/${room.id}`}>Join Room</Link>

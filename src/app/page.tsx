@@ -4,6 +4,7 @@ import { getRooms } from "@/data-access/rooms";
 import SearchBar from "@/components/SearchBar";
 import { RoomCard } from "@/components/RoomCard";
 import { unstable_noStore } from "next/cache";
+import { getSession } from "@/lib/auth";
 
 
 
@@ -12,14 +13,16 @@ export default async function Home({searchParams}:{searchParams:{search: string}
 
   unstable_noStore()
   const rooms = await getRooms(searchParams.search);
-
+  const session = await getSession()
 
   return (
     <main className="flex flex-col items-center justify-between p-24">
       <div className="flex justify-between items-center w-full">
         <h1 className="text-4xl">Find Your Dev</h1>
         <div className="flex flex-row gap-4">
-          <Button asChild><Link href="/your-rooms">Your Rooms</Link></Button>
+          {session && (
+            <Button asChild><Link href="/your-rooms">Your Rooms</Link></Button>
+          )}
           <Button asChild><Link href="/create-room">Create Room</Link></Button>
         </div>
       </div>
